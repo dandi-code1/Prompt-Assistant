@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Prompt Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="options.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-section"><div class="logo-icon"><i class="fab fa-github"></i></div><div class="logo-text"><h1>GitHub Prompt Assistant</h1><p>Secure prompt management solution</p></div></div>
+            <div class="header-status"><div class="status-badge"><div class="status-indicator"></div>Active</div><span>v1.7.2</span></div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="nav-tabs">
+            <div class="tab-container">
+                <ul class="tab-list">
+                    <li><button class="tab-button active" data-tab="dashboard"><i class="fas fa-tachometer-alt"></i>Dashboard</button></li>
+                    <li><button class="tab-button" data-tab="settings"><i class="fas fa-cog"></i>Configuration</button></li>
+                    <li><button class="tab-button" data-tab="help"><i class="fas fa-question-circle"></i>Documentation</button></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-content"><div class="stat-icon blue"><i class="fas fa-database"></i></div><div class="stat-info"><h3>Repositories</h3><p id="repo-status">0 configured</p></div></div></div>
+                <div class="stat-card"><div class="stat-content"><div class="stat-icon green"><i class="fas fa-file-alt"></i></div><div class="stat-info"><h3>Prompts</h3><p id="prompts-count">0 available</p></div></div></div>
+                <div class="stat-card"><div class="stat-content"><div class="stat-icon purple"><i class="fas fa-clock"></i></div><div class="stat-info"><h3>Last Sync</h3><p id="last-sync">Never</p></div></div></div>
+                <div class="stat-card"><div class="stat-content"><div class="stat-icon orange"><i class="fas fa-shield-alt"></i></div><div class="stat-info"><h3>Status</h3><p id="connection-status">Unknown</p></div></div></div>
+            </div>
+            <div class="grid lg:grid-cols-3 mt-6">
+                <div class="lg:col-span-2"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-heartbeat"></i> System Status</h3></div><div class="card-body"><div id="status-display"></div></div></div></div>
+                <div class="space-y-6"><div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3></div><div class="card-body"><div class="quick-actions"><button id="refresh-btn" class="btn btn-success"><i class="fas fa-sync-alt"></i> Refresh Data</button><button id="clear-cache-btn" class="btn btn-gray"><i class="fas fa-trash-alt"></i> Clear Cache</button></div></div></div></div>
+            </div>
+            <div class="card mt-6"><div class="card-header"><h3 class="card-title"><i class="fas fa-list"></i> Available Prompts<span id="prompts-badge" class="status-badge">0</span></h3></div><div class="card-body"><div id="prompts-list" class="prompts-grid"></div></div></div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <div class="grid">
+                <div id="settings-status" class="status-message hidden"></div>
+                <form id="settings-form">
+                    <div class="card mb-6">
+                        <div class="card-header"><h3 class="card-title"><i class="fas fa-shield-alt"></i> Security Settings</h3></div>
+                        <div class="card-body">
+                            <div class="setting-toggle"><label for="encryption-toggle" class="form-label mb-0">Enable Master Password Encryption</label><label class="switch"><input type="checkbox" id="encryption-toggle"><span class="slider"></span></label></div>
+                            <div class="security-warning hidden"><i class="fas fa-exclamation-triangle"></i><strong>Warning:</strong> Disabling this option will store access tokens in plaintext.</div>
+                            <div class="password-section hidden"><hr class="my-4"><div class="form-group"><label for="master-password" class="form-label">Create or Enter Master Password</label><input type="password" id="master-password" class="input-field"></div><div class="form-group"><label for="confirm-master-password" class="form-label">Confirm Master Password</label><input type="password" id="confirm-master-password" class="input-field"></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title"><i class="fab fa-github"></i> Repository Configuration</h3><p class="card-description">Add and manage your GitHub repositories.</p></div>
+                        <div class="card-body space-y-4" id="repo-list-container"></div>
+                        <div class="card-footer p-4 border-t border-gray-100"><button type="button" id="add-repo-btn" class="btn btn-primary"><i class="fas fa-plus mr-2"></i> Add Repository</button></div>
+                    </div>
+                    <div class="action-buttons"><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save All Settings</button></div>
+                </form>
+            </div>
+        </div>
+
+        <div id="help" class="tab-content">
+            <div class="grid lg:grid-cols-2 gap-6">
+                <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-rocket"></i> Getting Started</h3></div><div class="card-body"><div class="step-indicator"><div class="step-number">1</div><div class="step-content"><h4>Configure Repository</h4><p>In the Configuration tab, add a repository URL, a name, and choose a color.</p></div></div><div class="step-indicator"><div class="step-number">2</div><div class="step-content"><h4>Create Prompts</h4><p>In your GitHub repository, create Markdown (<code>.md</code>) files.</p></div></div><div class="step-indicator"><div class="step-number">3</div><div class="step-content"><h4>Use Placeholders</h4><p>Name files like <code>email-{subject}.md</code>. The content can then use <code>{subject}</code>.</p></div></div><div class="step-indicator"><div class="step-number">4</div><div class="step-content"><h4>Start Using</h4><p>Type <code>::prompt::</code> in any text field to open the menu.</p></div></div></div></div>
+                <div class="card"><div class="card-header"><h3 class="card-title"><i class="fas fa-keyboard"></i> Usage Instructions</h3></div><div class="card-body space-y-4"><div class="usage-item"><div><div class="font-medium">Open Prompt Menu</div></div><code>::prompt::</code></div><div class="usage-item"><div><div class="font-medium">Dynamic Placeholders</div></div><code>filename-{placeholder}.md</code></div><div class="usage-item"><div><div class="font-medium">Content Variables</div></div><code>Hello, {customer name}!</code></div></div></div>
+            </div>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

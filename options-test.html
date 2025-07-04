@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Prompt Settings - Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+        }
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-right: 10px; 
+        }
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        .test-btn { 
+            background-color: #6c757d; 
+        }
+        .test-btn:hover { 
+            background-color: #545b62; 
+        }
+        #status { 
+            margin-top: 20px; 
+            padding: 10px; 
+            border-radius: 4px; 
+            display: none; 
+        }
+        .status-success { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .status-error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .status-info { 
+            background-color: #d1ecf1; 
+            color: #0c5460; 
+            border: 1px solid #bee5eb; 
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Prompt Settings</h1>
+    
+    <div id="status"></div>
+    
+    <form id="settings-form">
+        <div class="form-group">
+            <label for="repo-url">GitHub Repository URL *</label>
+            <input type="text" id="repo-url" placeholder="https://github.com/owner/repo-name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="pat">Personal Access Token (Optional)</label>
+            <input type="password" id="pat" placeholder="ghp_... or github_pat_...">
+        </div>
+        
+        <div class="form-group">
+            <label for="psa-url">PSA URL (Optional)</label>
+            <input type="text" id="psa-url" placeholder="https://github.com/owner/repo/blob/main/psa.md">
+        </div>
+        
+        <button type="button" id="test-connection-btn" class="test-btn">Test Connection</button>
+        <button type="submit">Save Settings</button>
+    </form>
+    
+    <script>
+        console.log("🚀 Test script loaded!");
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🎯 DOM loaded!");
+            
+            const elements = {
+                repoUrlInput: document.getElementById('repo-url'),
+                patInput: document.getElementById('pat'),
+                psaUrlInput: document.getElementById('psa-url'),
+                settingsForm: document.getElementById('settings-form'),
+                statusDiv: document.getElementById('status'),
+                testConnectionBtn: document.getElementById('test-connection-btn')
+            };
+            
+            console.log("🔍 Elements found:", Object.fromEntries(
+                Object.entries(elements).map(([key, el]) => [key, !!el])
+            ));
+            
+            function showStatus(message, type = 'info') {
+                console.log(`📢 Status [${type}]: ${message}`);
+                elements.statusDiv.textContent = message;
+                elements.statusDiv.className = `status-${type}`;
+                elements.statusDiv.style.display = 'block';
+                
+                if (type === 'success') {
+                    setTimeout(() => {
+                        elements.statusDiv.style.display = 'none';
+                    }, 5000);
+                }
+            }
+            
+            function parseGitHubUrl(url) {
+                try {
+                    const urlObj = new URL(url);
+                    const pathParts = urlObj.pathname.split('/').filter(part => part);
+                    if (urlObj.hostname === 'github.com' && pathParts.length >= 2) {
+                        return { owner: pathParts[0], repo: pathParts[1].replace('.git', '') };
+                    }
+                } catch (e) {
+                    console.error("Error parsing URL:", e);
+                }
+                return null;
+            }
+            
+            async function testConnection() {
+                console.log("🚀 Test connection clicked!");
+                
+                const repoUrl = elements.repoUrlInput.value.trim();
+                const pat = elements.patInput.value.trim();
+                
+                console.log("📝 Input values:", { repoUrl, pat: pat ? '[PROVIDED]' : '[EMPTY]' });
+                
+                if (!repoUrl) {
+                    showStatus('Please enter a GitHub repository URL.', 'error');
+                    return;
+                }
+                
+                const repoInfo = parseGitHubUrl(repoUrl);
+                if (!repoInfo) {
+                    showStatus('Invalid GitHub repository URL format.', 'error');
+                    return;
+                }
+                
+                console.log("🔍 Parsed repo:", repoInfo);
+                showStatus('Testing connection...', 'info');
+                
+                const apiUrl = `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}`;
+                const headers = { 'Accept': 'application/vnd.github.v3+json' };
+                
+                if (pat) {
+                    headers['Authorization'] = `token ${pat}`;
+                }
+                
+                console.log("🌐 Making request to:", apiUrl);
+                
+                try {
+                    const response = await fetch(apiUrl, { headers });
+                    console.log("📡 Response status:", response.status);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        showStatus(`✅ Success! Repository "${data.full_name}" is accessible.`, 'success');
+                        console.log("✅ Repository data:", data);
+                    } else if (response.status === 404) {
+                        showStatus('❌ Repository not found. Check the URL.', 'error');
+                    } else if (response.status === 401) {
+                        showStatus('❌ Unauthorized. Check your Personal Access Token.', 'error');
+                    } else if (response.status === 403) {
+                        showStatus('❌ Forbidden. Rate limit or permission issue.', 'error');
+                    } else {
+                        showStatus(`❌ Error: HTTP ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    console.error("❌ Fetch error:", error);
+                    showStatus('❌ Network error. Check your internet connection.', 'error');
+                }
+            }
+            
+            function saveSettings(e) {
+                e.preventDefault();
+                console.log("💾 Save clicked!");
+                
+                const settings = {
+                    repoUrl: elements.repoUrlInput.value.trim(),
+                    pat: elements.patInput.value.trim(),
+                    psaUrl: elements.psaUrlInput.value.trim()
+                };
+                
+                console.log("📝 Saving:", { ...settings, pat: settings.pat ? '[PROVIDED]' : '[EMPTY]' });
+                
+                chrome.storage.local.set(settings, () => {
+                    if (chrome.runtime.lastError) {
+                        console.error("❌ Save error:", chrome.runtime.lastError);
+                        showStatus(`Save error: ${chrome.runtime.lastError.message}`, 'error');
+                        return;
+                    }
+                    
+                    console.log("✅ Settings saved!");
+                    showStatus('Settings saved successfully!', 'success');
+                    
+                    chrome.runtime.sendMessage({ action: 'fetchData' }, (response) => {
+                        console.log("📡 Background response:", response);
+                    });
+                });
+            }
+            
+            function loadSettings() {
+                console.log("📂 Loading settings...");
+                chrome.storage.local.get(['repoUrl', 'pat', 'psaUrl'], (result) => {
+                    console.log("📋 Loaded settings:", { ...result, pat: result.pat ? '[LOADED]' : '[EMPTY]' });
+                    
+                    if (result.repoUrl) elements.repoUrlInput.value = result.repoUrl;
+                    if (result.pat) elements.patInput.value = result.pat;
+                    if (result.psaUrl) elements.psaUrlInput.value = result.psaUrl;
+                });
+            }
+            
+            // Set up event listeners
+            console.log("🔗 Setting up event listeners...");
+            
+            elements.testConnectionBtn.addEventListener('click', function(e) {
+                console.log("🎯 Test button event triggered!");
+                testConnection();
+            });
+            
+            elements.settingsForm.addEventListener('submit', saveSettings);
+            
+            // Load settings
+            loadSettings();
+            
+            console.log("✅ Test page initialized!");
+        });
+    </script>
+</body>
+</html>

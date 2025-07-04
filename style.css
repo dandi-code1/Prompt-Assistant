@@ -1,0 +1,113 @@
+/* style.css */
+
+#prompt-menu {
+    position: absolute;
+    z-index: 10000;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 250px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+}
+
+#prompt-menu input {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    background-color: #fafafa;
+}
+
+#prompt-menu input:focus {
+    background-color: #fff;
+    border-bottom-color: #007bff;
+}
+
+#prompt-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+#prompt-menu li {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.15s ease;
+    font-size: 14px;
+    color: #333;
+}
+
+#prompt-menu li:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#prompt-menu li:hover,
+#prompt-menu li.highlighted {
+    background-color: #f0f8ff;
+    color: #007bff;
+}
+
+#prompt-menu li:active {
+    background-color: #e6f3ff;
+}
+
+/* Style for disabled/informational items */
+#prompt-menu li[style*="italic"] {
+    cursor: default;
+    color: #666;
+    font-style: italic;
+}
+
+#prompt-menu li[style*="italic"]:hover {
+    background-color: transparent;
+    color: #666;
+}
+
+/* Scrollbar styling for webkit browsers */
+#prompt-menu ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+#prompt-menu ul::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#prompt-menu ul::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+#prompt-menu ul::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Animation for menu appearance */
+#prompt-menu {
+    animation: menuFadeIn 0.15s ease-out;
+}
+
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
